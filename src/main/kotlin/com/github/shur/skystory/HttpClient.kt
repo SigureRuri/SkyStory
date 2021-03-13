@@ -4,7 +4,6 @@
  */
 package com.github.shur.skystory
 
-import org.json.JSONObject
 import java.io.IOException
 import java.io.PrintWriter
 import java.net.HttpURLConnection
@@ -78,12 +77,12 @@ class HttpClient {
     fun postWithJson(
         url: URL,
         headers: Headers,
-        json: JSONObject
+        json: String
     ): HttpResponse {
         return postDirect(
             url,
             headers.toMutableMap().apply { put("Content-Type", "application/json; charset=utf-8") },
-            json.toString()
+            json
         )
     }
     
@@ -122,12 +121,12 @@ class HttpClient {
     fun putWithJson(
         url: URL,
         headers: Headers,
-        json: JSONObject
+        json: String
     ): HttpResponse {
         return putDirect(
             url,
             headers.toMutableMap().apply { put("Content-Type", "application/json; charset=utf-8") },
-            json.toString()
+            json
         )
     }
 
@@ -166,12 +165,12 @@ class HttpClient {
     fun deleteWithJson(
         url: URL,
         headers: Headers,
-        json: JSONObject
+        json: String
     ): HttpResponse {
         return deleteDirect(
             url,
             headers.toMutableMap().apply { put("Content-Type", "application/json; charset=utf-8") },
-            json.toString()
+            json
         )
     }
 
