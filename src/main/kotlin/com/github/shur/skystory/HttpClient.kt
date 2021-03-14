@@ -7,7 +7,6 @@ package com.github.shur.skystory
 import java.io.IOException
 import java.io.PrintWriter
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
 import java.net.URL
 
 
@@ -28,10 +27,9 @@ class HttpClient {
      * @param baseUrl 送信するURL
      * @param headers ヘッダー
      * @param parameters パラメータ
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun get(
         baseUrl: URL,
         headers: Headers,
@@ -48,10 +46,9 @@ class HttpClient {
      * @param url 送信するURL
      * @param headers ヘッダー
      * @param parameters パラメータ
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun post(
         url: URL,
         headers: Headers,
@@ -70,10 +67,9 @@ class HttpClient {
      * @param url 送信するURL
      * @param headers ヘッダー
      * @param json json
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun postWithJson(
         url: URL,
         headers: Headers,
@@ -92,10 +88,9 @@ class HttpClient {
      * @param url 送信するURL
      * @param headers ヘッダー
      * @param parameters パラメータ
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun put(
         url: URL,
         headers: Headers,
@@ -114,10 +109,9 @@ class HttpClient {
      * @param url 送信するURL
      * @param headers ヘッダー
      * @param json json
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun putWithJson(
         url: URL,
         headers: Headers,
@@ -136,10 +130,9 @@ class HttpClient {
      * @param url 送信するURL
      * @param headers ヘッダー
      * @param parameters パラメータ
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun delete(
         url: URL,
         headers: Headers,
@@ -158,10 +151,9 @@ class HttpClient {
      * @param url 送信するURL
      * @param headers ヘッダー
      * @param json json
-     * @throws IOException
-     * @throws SocketTimeoutException
+     * @throws HttpConnectionException 通信中にエラーが発生したとき
      */
-    @Throws(IOException::class, SocketTimeoutException::class)
+    @Throws(HttpConnectionException::class)
     fun deleteWithJson(
         url: URL,
         headers: Headers,
@@ -179,22 +171,26 @@ class HttpClient {
         url: URL,
         headers: Headers
     ): HttpResponse {
-        val connection = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "GET"
-            headers.forEach { setRequestProperty(it.key, it.value) }
-            doInput = true
-            doOutput = false
-            useCaches = false
-            connectTimeout = CONNECT_TIMEOUT
-            readTimeout = READ_TIMEOUT
+        try {
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                headers.forEach { setRequestProperty(it.key, it.value) }
+                doInput = true
+                doOutput = false
+                useCaches = false
+                connectTimeout = CONNECT_TIMEOUT
+                readTimeout = READ_TIMEOUT
+            }
+            connection.connect()
+
+            val response = createResponse(connection)
+
+            connection.disconnect()
+
+            return response
+        } catch (e: Exception) {
+            throw HttpConnectionException(e)
         }
-        connection.connect()
-
-        val response = createResponse(connection)
-
-        connection.disconnect()
-
-        return response
     }
 
     private fun putDirect(
@@ -202,27 +198,31 @@ class HttpClient {
         headers: Headers,
         rawBody: String
     ): HttpResponse {
-        val connection = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "PUT"
-            headers.forEach { setRequestProperty(it.key, it.value) }
-            doInput = true
-            doOutput = true
-            useCaches = false
-            connectTimeout = CONNECT_TIMEOUT
-            readTimeout = READ_TIMEOUT
+        try {
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "PUT"
+                headers.forEach { setRequestProperty(it.key, it.value) }
+                doInput = true
+                doOutput = true
+                useCaches = false
+                connectTimeout = CONNECT_TIMEOUT
+                readTimeout = READ_TIMEOUT
 
-            val printWriter = PrintWriter(outputStream).apply {
-                print(rawBody)
+                val printWriter = PrintWriter(outputStream).apply {
+                    print(rawBody)
+                }
+                printWriter.close()
             }
-            printWriter.close()
+            connection.connect()
+
+            val response = createResponse(connection)
+
+            connection.disconnect()
+
+            return response
+        } catch (e: Exception) {
+            throw HttpConnectionException(e)
         }
-        connection.connect()
-
-        val response = createResponse(connection)
-
-        connection.disconnect()
-
-        return response
     }
 
     private fun postDirect(
@@ -230,27 +230,31 @@ class HttpClient {
         headers: Headers,
         rawBody: String
     ): HttpResponse {
-        val connection = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            headers.forEach { setRequestProperty(it.key, it.value) }
-            doInput = true
-            doOutput = true
-            useCaches = false
-            connectTimeout = CONNECT_TIMEOUT
-            readTimeout = READ_TIMEOUT
+        try {
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                headers.forEach { setRequestProperty(it.key, it.value) }
+                doInput = true
+                doOutput = true
+                useCaches = false
+                connectTimeout = CONNECT_TIMEOUT
+                readTimeout = READ_TIMEOUT
 
-            val printWriter = PrintWriter(outputStream).apply {
-                print(rawBody)
+                val printWriter = PrintWriter(outputStream).apply {
+                    print(rawBody)
+                }
+                printWriter.close()
             }
-            printWriter.close()
+            connection.connect()
+
+            val response = createResponse(connection)
+
+            connection.disconnect()
+
+            return response
+        } catch (e: Exception) {
+            throw HttpConnectionException(e)
         }
-        connection.connect()
-
-        val response = createResponse(connection)
-
-        connection.disconnect()
-
-        return response
     }
 
     private fun deleteDirect(
@@ -258,27 +262,31 @@ class HttpClient {
         headers: Headers,
         rawBody: String
     ): HttpResponse {
-        val connection = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "DELETE"
-            headers.forEach { setRequestProperty(it.key, it.value) }
-            doInput = true
-            doOutput = true
-            useCaches = false
-            connectTimeout = CONNECT_TIMEOUT
-            readTimeout = READ_TIMEOUT
+        try {
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "DELETE"
+                headers.forEach { setRequestProperty(it.key, it.value) }
+                doInput = true
+                doOutput = true
+                useCaches = false
+                connectTimeout = CONNECT_TIMEOUT
+                readTimeout = READ_TIMEOUT
 
-            val printWriter = PrintWriter(outputStream).apply {
-                print(rawBody)
+                val printWriter = PrintWriter(outputStream).apply {
+                    print(rawBody)
+                }
+                printWriter.close()
             }
-            printWriter.close()
+            connection.connect()
+
+            val response = createResponse(connection)
+
+            connection.disconnect()
+
+            return response
+        } catch (e: Exception) {
+            throw HttpConnectionException(e)
         }
-        connection.connect()
-
-        val response = createResponse(connection)
-
-        connection.disconnect()
-
-        return response
     }
 
     private fun createResponse(connection: HttpURLConnection): HttpResponse {
