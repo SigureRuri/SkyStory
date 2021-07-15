@@ -1,5 +1,5 @@
 /*
- * This file is part of SkyStory, licensed under the Apache License 2.0.
+ * This file is a part of SkyStory, licensed under the Apache License 2.0.
  * see LICENSE.
  */
 package com.github.shur.skystory
