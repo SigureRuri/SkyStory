@@ -27,6 +27,6 @@ data class HttpResponse(val url: URL,
      *
      * @return このレスポンスが成功したかどうか
      */
-    fun isSuccess() = responseCode < 400
+    fun isSuccess() = responseCode >= 200 || responseCode < 400
 
 }
