@@ -37,7 +37,7 @@ class HttpClient {
     ): HttpResponse {
         val stringUrl = parameters.map { "${it.key}=${it.value}" }.joinToString("&", "${baseUrl}?")
         val url = URL(stringUrl)
-        return getDirect(url, headers)
+        return getDirectly(url, headers)
     }
 
     /**
@@ -54,7 +54,7 @@ class HttpClient {
         headers: Headers,
         parameters: Parameters
     ): HttpResponse {
-        return postDirect(
+        return postDirectly(
             url,
             headers,
             parameters.map { "${it.key}=${it.value}" }.joinToString("&")
@@ -75,7 +75,7 @@ class HttpClient {
         headers: Headers,
         json: String
     ): HttpResponse {
-        return postDirect(
+        return postDirectly(
             url,
             headers.toMutableMap().apply { put("Content-Type", "application/json; charset=utf-8") },
             json
@@ -96,7 +96,7 @@ class HttpClient {
         headers: Headers,
         parameters: Parameters
     ): HttpResponse {
-        return putDirect(
+        return putDirectly(
             url,
             headers,
             parameters.map { "${it.key}=${it.value}" }.joinToString("&")
@@ -117,7 +117,7 @@ class HttpClient {
         headers: Headers,
         json: String
     ): HttpResponse {
-        return putDirect(
+        return putDirectly(
             url,
             headers.toMutableMap().apply { put("Content-Type", "application/json; charset=utf-8") },
             json
@@ -138,7 +138,7 @@ class HttpClient {
         headers: Headers,
         parameters: Parameters
     ): HttpResponse {
-        return deleteDirect(
+        return deleteDirectly(
             url,
             headers,
             parameters.map { "${it.key}=${it.value}" }.joinToString("&")
@@ -159,7 +159,7 @@ class HttpClient {
         headers: Headers,
         json: String
     ): HttpResponse {
-        return deleteDirect(
+        return deleteDirectly(
             url,
             headers.toMutableMap().apply { put("Content-Type", "application/json; charset=utf-8") },
             json
@@ -167,7 +167,7 @@ class HttpClient {
     }
 
 
-    private fun getDirect(
+    private fun getDirectly(
         url: URL,
         headers: Headers
     ): HttpResponse {
@@ -193,7 +193,7 @@ class HttpClient {
         }
     }
 
-    private fun putDirect(
+    private fun putDirectly(
         url: URL,
         headers: Headers,
         rawBody: String
@@ -225,7 +225,7 @@ class HttpClient {
         }
     }
 
-    private fun postDirect(
+    private fun postDirectly(
         url: URL,
         headers: Headers,
         rawBody: String
@@ -257,7 +257,7 @@ class HttpClient {
         }
     }
 
-    private fun deleteDirect(
+    private fun deleteDirectly(
         url: URL,
         headers: Headers,
         rawBody: String
