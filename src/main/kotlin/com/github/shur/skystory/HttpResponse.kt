@@ -28,6 +28,6 @@ data class HttpResponse(
      *
      * @return このレスポンスが成功したかどうか
      */
-    fun isSuccess() = responseCode >= 200 || responseCode < 400
+    fun isSuccess() = responseCode in 200..399
 
 }
