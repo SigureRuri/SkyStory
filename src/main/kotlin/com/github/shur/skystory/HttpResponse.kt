@@ -15,11 +15,12 @@ import java.net.URL
  * @property headers ヘッダー
  * @property result 結果
  */
-data class HttpResponse(val url: URL,
-                        val responseCode: Int,
-                        val responseMessage: String,
-                        val headers: Headers,
-                        val result: String
+data class HttpResponse(
+    val url: URL,
+    val responseCode: Int,
+    val responseMessage: String,
+    val headers: Headers,
+    val result: String
 ) {
 
     /**
